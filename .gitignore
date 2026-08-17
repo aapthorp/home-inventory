@@ -1,0 +1,15 @@
+# Node / Expo
+node_modules/
+.expo/
+dist/
+
+# Java / Maven / Quarkus
+target/
+*.class
+
+# Env files
+.env
+.env.local
+
+# OS
+.DS_Store

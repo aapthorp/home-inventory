@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "Home Inventory",
+    "slug": "home-inventory-mobile",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "homeinventory",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used to scan barcodes and photograph items."
+      }
+    },
+    "android": {
+      "permissions": ["CAMERA"]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan barcodes and photograph items."
+        }
+      ]
+    ]
+  }
+}
