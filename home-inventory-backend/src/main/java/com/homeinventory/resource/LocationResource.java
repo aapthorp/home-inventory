@@ -13,6 +13,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -65,5 +66,23 @@ public class LocationResource {
         }
         location.deletedAt = java.time.Instant.now();
         return Response.noContent().build();
+    }
+
+    @PATCH
+    @Path("/{id}")
+    @Transactional
+    public Location update(@PathParam("id") UUID id, LocationRequest request) {
+        Location location = Location.<Location>find(
+                "id = ?1 and householdId = ?2 and deletedAt is null", id, householdContext.currentHouseholdId())
+            .firstResult();
+        if (location == null) {
+            throw new NotFoundException("Location not found: " + id);
+        }
+        location.name = request.name();
+        location.parentLocationId = request.parentLocationId();
+        if (request.type() != null) {
+            location.type = request.type();
+        }
+        return location;
     }
 }

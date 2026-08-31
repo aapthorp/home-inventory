@@ -13,6 +13,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -60,5 +61,20 @@ public class CategoryResource {
         }
         category.deletedAt = java.time.Instant.now();
         return Response.noContent().build();
+    }
+
+    @PATCH
+    @Path("/{id}")
+    @Transactional
+    public Category update(@PathParam("id") UUID id, CategoryRequest request) {
+        Category category = Category.<Category>find(
+                "id = ?1 and householdId = ?2 and deletedAt is null", id, householdContext.currentHouseholdId())
+            .firstResult();
+        if (category == null) {
+            throw new NotFoundException("Category not found: " + id);
+        }
+        category.name = request.name();
+        category.parentCategoryId = request.parentCategoryId();
+        return category;
     }
 }

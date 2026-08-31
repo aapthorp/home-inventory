@@ -13,6 +13,7 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -61,5 +62,23 @@ public class CollectionResource {
         }
         collection.deletedAt = java.time.Instant.now();
         return Response.noContent().build();
+    }
+
+    @PATCH
+    @Path("/{id}")
+    @Transactional
+    public Collection update(@PathParam("id") UUID id, CollectionRequest request) {
+        Collection collection = Collection.<Collection>find(
+                "id = ?1 and householdId = ?2 and deletedAt is null", id, householdContext.currentHouseholdId())
+            .firstResult();
+        if (collection == null) {
+            throw new NotFoundException("Collection not found: " + id);
+        }
+        collection.name = request.name();
+        collection.description = request.description();
+        if (request.type() != null) {
+            collection.type = request.type();
+        }
+        return collection;
     }
 }
