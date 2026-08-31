@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Pressable, StyleSheet, ScrollView, Alert } from "react-native";
+import axios from "axios";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/navigation/RootNavigator";
 import { useCreateItem } from "@/api/items";
@@ -29,21 +30,30 @@ export default function AddItemScreen({ route, navigation }: Props) {
       brand: brand || null,
       model: null,
       serialNumber: null,
-      condition: "good",
+      condition: "GOOD",
       quantity: 1,
       purchaseDate: null,
       purchasePrice: null,
       currency: null,
       currentEstimatedValue: null,
       warrantyExpiryDate: null,
-      status: "owned",
+      status: "OWNED",
       notes: null,
     };
     try {
       await createItem.mutateAsync(draft);
       navigation.goBack();
-    } catch {
-      Alert.alert("Couldn't save", "Check your connection and try again.");
+    } catch (error) {
+      // Log the real cause during development — a 400 (validation/deserialization
+      // error) looks identical to a network failure to the user otherwise, and
+      // is very easy to misdiagnose as a connectivity problem (as happened here
+      // with a lowercase/uppercase enum mismatch).
+      if (axios.isAxiosError(error)) {
+        console.error("Save item failed:", error.response?.status, error.response?.data);
+      } else {
+        console.error("Save item failed:", error);
+      }
+      Alert.alert("Couldn't save", "Check the Metro console for details — see server response status/data.");
     }
   };
 

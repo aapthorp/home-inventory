@@ -7,7 +7,7 @@ export interface Location {
   id: UUID;
   name: string;
   parentLocationId: UUID | null;
-  type: "room" | "container" | "shelf" | "box";
+  type: "ROOM" | "CONTAINER" | "SHELF" | "BOX";
 }
 
 export interface Category {
@@ -20,11 +20,14 @@ export interface Collection {
   id: UUID;
   name: string;
   description: string | null;
-  type: "music" | "video" | "books" | "general" | null;
+  type: "MUSIC" | "VIDEO" | "BOOKS" | "GENERAL" | null;
 }
 
-export type ItemCondition = "new" | "good" | "fair" | "poor";
-export type ItemStatus = "owned" | "loaned_out" | "sold" | "disposed" | "lost";
+// These string unions must match the Java enum constant names exactly
+// (case-sensitive) — Jackson deserializes JSON strings against Item.Condition
+// and Item.Status by exact name, e.g. "GOOD" not "good".
+export type ItemCondition = "NEW" | "GOOD" | "FAIR" | "POOR";
+export type ItemStatus = "OWNED" | "LOANED_OUT" | "SOLD" | "DISPOSED" | "LOST";
 
 export interface Item {
   id: UUID;
@@ -55,7 +58,7 @@ export interface Item {
 export interface ItemAttachment {
   id: UUID;
   itemId: UUID;
-  type: "photo" | "receipt" | "manual" | "warranty_doc";
+  type: "PHOTO" | "RECEIPT" | "MANUAL" | "WARRANTY_DOC";
   storageUrl: string;
   uploadedAt: string;
 }

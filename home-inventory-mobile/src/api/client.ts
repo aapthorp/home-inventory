@@ -15,9 +15,17 @@ export function setAuthToken(token: string | null) {
   authToken = token;
 }
 
+let householdId: string | null = process.env.EXPO_PUBLIC_HOUSEHOLD_ID ?? null;
+export function setHouseholdId(id: string | null) {
+  householdId = id;
+}
+
 apiClient.interceptors.request.use((config) => {
   if (authToken) {
     config.headers.Authorization = `Bearer ${authToken}`;
+  }
+  if (householdId) {
+    config.headers["X-Household-Id"] = householdId;
   }
   return config;
 });
