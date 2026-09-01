@@ -74,7 +74,16 @@
       <artifactId>quarkus-smallrye-openapi</artifactId>
     </dependency>
 
-    <!-- Object storage client (MinIO/S3) -->
+    <dependency>
+      <groupId>io.minio</groupId>
+      <artifactId>minio</artifactId>
+      <version>8.5.17</version>
+    </dependency>
+    <!-- Object storage client (MinIO/S3) — Quarkiverse community extension, note the groupId.
+         Quarkiverse extensions trail the core Quarkus release by a version or two; this is
+         the newest release as of writing and has been fine paired with 3.33.x in practice,
+         but re-check quarkus.io/extensions/io.quarkiverse.minio/quarkus-minio if you bump
+         quarkus.platform.version again later. -->
     <dependency>
       <groupId>io.quarkiverse.minio</groupId>
       <artifactId>quarkus-minio</artifactId>
