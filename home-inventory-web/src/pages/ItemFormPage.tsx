@@ -5,6 +5,7 @@ import { useCreateItem, useItem, useUpdateItem, useDeleteItem } from "@/api/item
 import { locationHooks, categoryHooks, collectionHooks } from "@/api/resources";
 import { useBarcodeLookup } from "@/api/barcode";
 import { buildTree } from "@/utils/tree";
+import AttachmentsPanel from "@/components/AttachmentsPanel";
 import type { ItemCondition, ItemRequest, ItemStatus, Location, Category } from "@/types/inventory";
 
 function flattenForSelect<T extends { id: string; name: string }>(
@@ -355,6 +356,16 @@ export default function ItemFormPage() {
           </button>
         </div>
       </form>
+
+      {isEditing && id ? (
+        <div className="form-grid" style={{ marginTop: 20 }}>
+          <AttachmentsPanel itemId={id} />
+        </div>
+      ) : (
+        <p className="helper-text" style={{ marginTop: 16 }}>
+          Save the item first to add photos and other attachments.
+        </p>
+      )}
     </div>
   );
 }

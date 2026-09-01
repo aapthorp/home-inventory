@@ -90,3 +90,22 @@ export interface CollectionRequest {
   description: string | null;
   type: CollectionType | null;
 }
+
+export type AttachmentType = "PHOTO" | "RECEIPT" | "MANUAL" | "WARRANTY_DOC";
+
+export interface ItemAttachment {
+  id: UUID;
+  type: AttachmentType;
+  label: string | null;
+  contentType: string | null;
+  sizeBytes: number | null;
+  sortOrder: number;
+  downloadUrl: string | null;
+  createdAt: string;
+}
+
+export interface ItemAttachmentUpdateRequest {
+  label?: string | null;
+  type?: AttachmentType;
+  sortOrder?: number;
+}
