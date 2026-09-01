@@ -22,6 +22,17 @@ endpoints the mobile app already expects: Item/Location/Category/Collection CRUD
 - `db/migration/V1__init.sql` — Flyway migration matching the entity model exactly.
 - `docker-compose.yml` — Postgres + MinIO + the API itself, mirroring the architecture doc's
   deployment section.
+- `service/itemtype/` — **pluggable item types.** `Item.itemType` discriminates GENERIC / BOOK /
+  FILM / MUSIC_ALBUM; each non-generic type has its own 1:1 extension table (`BookDetails`,
+  `FilmDetails`, `MusicAlbumDetails`) for real typed columns rather than a JSONB blob. Adding a new
+  type (e.g. Wine) is: one Flyway migration, one entity, one `ItemTypeDetailsHandler`
+  implementation (auto-discovered via CDI — no manual registration), and one schema entry in
+  `ItemTypeSchemas`. Nothing else changes — `ItemResource` and both frontends are written against
+  the generic `Map<String, Object> details` contract, not against specific types, and
+  `GET /item-types` lets the frontends render type-specific form fields without per-type UI code.
+
+  Known limitation: changing an item's `itemType` doesn't clean up the previous type's details
+  row — it's just orphaned. Fine for MVP; revisit if that turns out to matter in practice.
 
 ## What's deliberately not here yet
 

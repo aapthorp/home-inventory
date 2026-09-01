@@ -3,14 +3,17 @@ package com.homeinventory.dto;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import com.homeinventory.domain.Item;
+import com.homeinventory.domain.ItemType;
 
 /** Full item representation returned by GET endpoints. */
 public record ItemResponse(
     UUID id,
+    ItemType itemType,
     String name,
     String description,
     UUID categoryId,
@@ -31,12 +34,19 @@ public record ItemResponse(
     String notes,
     Set<String> tags,
     Set<UUID> collectionIds,
+    // Type-specific fields (ISBN/author for BOOK, director/runtime for FILM, etc.) —
+    // empty for GENERIC. Populated via the matching ItemTypeDetailsHandler rather than
+    // being part of the Item entity itself; see ItemResource.toResponse.
+    Map<String, Object> details,
     Instant createdAt,
     Instant updatedAt
 ) {
-    public static ItemResponse from(Item item) {
+    /** details is supplied by the caller (ItemResource) since building it requires a
+     *  registry lookup this DTO shouldn't need to know about. */
+    public static ItemResponse from(Item item, Map<String, Object> details) {
         return new ItemResponse(
             item.id,
+            item.itemType,
             item.name,
             item.description,
             item.categoryId,
@@ -57,6 +67,7 @@ public record ItemResponse(
             item.notes,
             item.tags,
             item.collections.stream().map(c -> c.id).collect(java.util.stream.Collectors.toSet()),
+            details,
             item.createdAt,
             item.updatedAt
         );

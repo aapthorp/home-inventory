@@ -25,6 +25,10 @@ public class Item extends AbstractEntity {
     @Column(nullable = false)
     public UUID householdId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    public ItemType itemType = ItemType.GENERIC;
+
     @Column(nullable = false)
     public String name;
 

@@ -1,15 +1,18 @@
 package com.homeinventory.resource;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.homeinventory.domain.Collection;
 import com.homeinventory.domain.Item;
+import com.homeinventory.domain.ItemType;
 import com.homeinventory.dto.ItemRequest;
 import com.homeinventory.dto.ItemResponse;
 import com.homeinventory.service.HouseholdContext;
+import com.homeinventory.service.itemtype.ItemTypeRegistry;
 
 import io.quarkus.panache.common.Parameters;
 import jakarta.inject.Inject;
@@ -33,6 +36,9 @@ public class ItemResource {
 
     @Inject
     HouseholdContext householdContext;
+
+    @Inject
+    ItemTypeRegistry itemTypeRegistry;
 
     @GET
     public List<ItemResponse> search(
@@ -66,7 +72,7 @@ public class ItemResource {
         return Item.<Item>find(jpql.toString(), params)
             .list()
             .stream()
-            .map(ItemResponse::from)
+            .map(this::toResponse)
             .collect(Collectors.toList());
     }
 
@@ -74,7 +80,7 @@ public class ItemResource {
     @Path("/{id}")
     public ItemResponse getOne(@PathParam("id") UUID id) {
         Item item = findOwnedOrThrow(id);
-        return ItemResponse.from(item);
+        return toResponse(item);
     }
 
     @POST
@@ -84,7 +90,8 @@ public class ItemResource {
         item.householdId = householdContext.currentHouseholdId();
         applyRequest(item, request);
         item.persist();
-        return Response.status(Response.Status.CREATED).entity(ItemResponse.from(item)).build();
+        applyDetails(item, request);
+        return Response.status(Response.Status.CREATED).entity(toResponse(item)).build();
     }
 
     @PATCH
@@ -93,7 +100,8 @@ public class ItemResource {
     public ItemResponse update(@PathParam("id") UUID id, ItemRequest request) {
         Item item = findOwnedOrThrow(id);
         applyRequest(item, request);
-        return ItemResponse.from(item);
+        applyDetails(item, request);
+        return toResponse(item);
     }
 
     @DELETE
@@ -117,6 +125,7 @@ public class ItemResource {
 
     /** Applies non-null fields from the request onto the entity — shared by create and update. */
     private void applyRequest(Item item, ItemRequest r) {
+        if (r.itemType() != null) item.itemType = r.itemType();
         item.name = r.name();
         item.description = r.description();
         item.categoryId = r.categoryId();
@@ -143,5 +152,25 @@ public class ItemResource {
                 .collect(Collectors.toSet());
             item.collections = collections;
         }
+    }
+
+    /** Dispatches the generic details map to whichever handler matches item.itemType.
+     *  No-op for GENERIC or if details weren't included in the request (PATCH without
+     *  touching type-specific fields, for example). */
+    private void applyDetails(Item item, ItemRequest r) {
+        if (item.itemType == ItemType.GENERIC || r.details() == null) {
+            return;
+        }
+        itemTypeRegistry.handlerFor(item.itemType)
+            .ifPresent(handler -> handler.applyDetails(item.id, r.details()));
+    }
+
+    private ItemResponse toResponse(Item item) {
+        Map<String, Object> details = item.itemType == ItemType.GENERIC
+            ? Map.of()
+            : itemTypeRegistry.handlerFor(item.itemType)
+                .map(handler -> handler.toDetailsMap(item.id))
+                .orElse(Map.of());
+        return ItemResponse.from(item, details);
     }
 }
