@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, ActivityIndicator } from "react-native";
 import { CameraView, useCameraPermissions } from "expo-camera";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "@/navigation/RootNavigator";
+import type { ItemsStackParamList } from "@/navigation/RootNavigator";
 import { useBarcodeLookup } from "@/api/barcode";
 
-type Props = NativeStackScreenProps<RootStackParamList, "BarcodeScan">;
+type Props = NativeStackScreenProps<ItemsStackParamList, "BarcodeScan">;
 
 export default function BarcodeScanScreen({ navigation }: Props) {
   const [permission, requestPermission] = useCameraPermissions();
@@ -29,12 +29,12 @@ export default function BarcodeScanScreen({ navigation }: Props) {
     setScanned(true);
     try {
       const result = await lookup.mutateAsync(data);
-      navigation.replace("AddItem", {
+      navigation.replace("ItemForm", {
         prefill: { barcode: data, brand: result.brand ?? undefined, name: result.name ?? undefined },
       });
     } catch {
       // Lookup failed (e.g. unknown barcode) — still let the user add the item manually.
-      navigation.replace("AddItem", { prefill: { barcode: data } });
+      navigation.replace("ItemForm", { prefill: { barcode: data } });
     }
   };
 

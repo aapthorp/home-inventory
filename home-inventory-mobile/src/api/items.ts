@@ -40,10 +40,10 @@ export function useItems(filters: ItemFilters = {}) {
   });
 }
 
-export function useItem(id: UUID) {
+export function useItem(id: UUID | undefined) {
   return useQuery({
     queryKey: ["items", id],
-    queryFn: () => fetchItem(id),
+    queryFn: () => fetchItem(id as UUID),
     enabled: !!id,
   });
 }

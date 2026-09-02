@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, FlatList, TextInput, Pressable, StyleSheet } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import type { RootStackParamList } from "@/navigation/RootNavigator";
+import type { ItemsStackParamList } from "@/navigation/RootNavigator";
 import { useItems } from "@/api/items";
 
-type Props = NativeStackScreenProps<RootStackParamList, "ItemList">;
+type Props = NativeStackScreenProps<ItemsStackParamList, "ItemList">;
 
 export default function ItemListScreen({ navigation }: Props) {
   const [query, setQuery] = useState("");
@@ -39,15 +39,20 @@ export default function ItemListScreen({ navigation }: Props) {
             style={styles.row}
             onPress={() => navigation.navigate("ItemDetail", { itemId: item.id })}
           >
-            <Text style={styles.rowTitle}>{item.name}</Text>
-            <Text style={styles.rowSubtitle}>
-              {[item.brand, item.model].filter(Boolean).join(" · ") || "No brand/model set"}
-            </Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.rowTitle}>{item.name}</Text>
+              <Text style={styles.rowSubtitle}>
+                {[item.brand, item.model].filter(Boolean).join(" · ") || "No brand/model set"}
+              </Text>
+            </View>
+            {item.itemType !== "GENERIC" && (
+              <Text style={styles.typeBadge}>{item.itemType.replace("_", " ").toLowerCase()}</Text>
+            )}
           </Pressable>
         )}
       />
 
-      <Pressable style={styles.fab} onPress={() => navigation.navigate("AddItem")}>
+      <Pressable style={styles.fab} onPress={() => navigation.navigate("ItemForm", {})}>
         <Text style={styles.fabText}>+</Text>
       </Pressable>
     </View>
@@ -73,9 +78,26 @@ const styles = StyleSheet.create({
   },
   scanButtonText: { color: "#fff", fontWeight: "600" },
   helperText: { textAlign: "center", color: "#666", marginTop: 24 },
-  row: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: "#eee" },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
   rowTitle: { fontSize: 16, fontWeight: "500" },
   rowSubtitle: { fontSize: 13, color: "#777", marginTop: 2 },
+  typeBadge: {
+    fontSize: 10,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    color: "#1f6feb",
+    backgroundColor: "#eaf1fd",
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
   fab: {
     position: "absolute",
     right: 20,

@@ -21,6 +21,13 @@
         {
           "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan barcodes and photograph items."
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos to attach them to items.",
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to photograph items."
+        }
       ]
     ]
   }

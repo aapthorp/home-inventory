@@ -1,37 +1,74 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import ItemListScreen from "@/screens/ItemListScreen";
 import ItemDetailScreen from "@/screens/ItemDetailScreen";
-import AddItemScreen from "@/screens/AddItemScreen";
+import ItemFormScreen from "@/screens/ItemFormScreen";
 import BarcodeScanScreen from "@/screens/BarcodeScanScreen";
+import LocationsScreen from "@/screens/LocationsScreen";
+import CategoriesScreen from "@/screens/CategoriesScreen";
 import CollectionsScreen from "@/screens/CollectionsScreen";
+import SettingsScreen from "@/screens/SettingsScreen";
 import type { UUID } from "@/types/inventory";
 
-export type RootStackParamList = {
+/** The Items tab's own nested stack — list -> detail -> form -> scan.
+ *  Exported so screens within this stack can type their navigation props. */
+export type ItemsStackParamList = {
   ItemList: undefined;
   ItemDetail: { itemId: UUID };
-  AddItem: { prefill?: { barcode?: string; brand?: string; name?: string } } | undefined;
+  ItemForm: { itemId?: UUID; prefill?: { barcode?: string; brand?: string; name?: string } };
   BarcodeScan: undefined;
-  Collections: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+export type RootTabParamList = {
+  ItemsTab: undefined;
+  Locations: undefined;
+  Categories: undefined;
+  Collections: undefined;
+  Settings: undefined;
+};
+
+const ItemsStack = createNativeStackNavigator<ItemsStackParamList>();
+const Tab = createBottomTabNavigator<RootTabParamList>();
+
+function ItemsStackNavigator() {
+  return (
+    <ItemsStack.Navigator initialRouteName="ItemList">
+      <ItemsStack.Screen name="ItemList" component={ItemListScreen} options={{ title: "Inventory" }} />
+      <ItemsStack.Screen name="ItemDetail" component={ItemDetailScreen} options={{ title: "Item" }} />
+      <ItemsStack.Screen name="ItemForm" component={ItemFormScreen} options={{ title: "Add item" }} />
+      <ItemsStack.Screen
+        name="BarcodeScan"
+        component={BarcodeScanScreen}
+        options={{ title: "Scan barcode", presentation: "modal" }}
+      />
+    </ItemsStack.Navigator>
+  );
+}
 
 export default function RootNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="ItemList">
-        <Stack.Screen name="ItemList" component={ItemListScreen} options={{ title: "Inventory" }} />
-        <Stack.Screen name="ItemDetail" component={ItemDetailScreen} options={{ title: "Item" }} />
-        <Stack.Screen name="AddItem" component={AddItemScreen} options={{ title: "Add item" }} />
-        <Stack.Screen
-          name="BarcodeScan"
-          component={BarcodeScanScreen}
-          options={{ title: "Scan barcode", presentation: "modal" }}
+      <Tab.Navigator screenOptions={{ headerShown: false }}>
+        <Tab.Screen name="ItemsTab" component={ItemsStackNavigator} options={{ title: "Items" }} />
+        <Tab.Screen
+          name="Locations"
+          component={LocationsScreen}
+          options={{ headerShown: true, title: "Locations" }}
         />
-        <Stack.Screen name="Collections" component={CollectionsScreen} options={{ title: "Collections" }} />
-      </Stack.Navigator>
+        <Tab.Screen
+          name="Categories"
+          component={CategoriesScreen}
+          options={{ headerShown: true, title: "Categories" }}
+        />
+        <Tab.Screen
+          name="Collections"
+          component={CollectionsScreen}
+          options={{ headerShown: true, title: "Collections" }}
+        />
+        <Tab.Screen name="Settings" component={SettingsScreen} options={{ headerShown: true, title: "Settings" }} />
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }
