@@ -14,7 +14,10 @@ public class BookDetails extends AbstractEntity {
     public UUID itemId;
 
     @Column
-    public String isbn;
+    public String isbn13;
+
+    @Column
+    public String isbn10;
 
     @Column
     public String author;
@@ -27,4 +30,10 @@ public class BookDetails extends AbstractEntity {
 
     @Column
     public Integer publishedYear;
+
+    /** Free-text rather than an enum column — keeps new format values (e.g. a future
+     *  "Large print") addable without a migration; the schema endpoint supplies the
+     *  suggested options for the dropdown. */
+    @Column
+    public String format;
 }

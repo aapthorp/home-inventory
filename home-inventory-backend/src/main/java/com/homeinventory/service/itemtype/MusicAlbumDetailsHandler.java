@@ -29,6 +29,9 @@ public class MusicAlbumDetailsHandler extends AbstractItemTypeDetailsHandler imp
         map.put("label", details.label);
         map.put("releaseYear", details.releaseYear);
         map.put("trackCount", details.trackCount);
+        map.put("format", details.format);
+        map.put("ean", details.ean);
+        map.put("upc", details.upc);
         return map;
     }
 
@@ -44,6 +47,9 @@ public class MusicAlbumDetailsHandler extends AbstractItemTypeDetailsHandler imp
         entity.label = asString(details.get("label"));
         entity.releaseYear = asInteger(details.get("releaseYear"));
         entity.trackCount = asInteger(details.get("trackCount"));
+        entity.format = asString(details.get("format"));
+        entity.ean = asString(details.get("ean"));
+        entity.upc = asString(details.get("upc"));
         if (entity.id == null) {
             entity.persist();
         }

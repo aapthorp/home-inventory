@@ -24,4 +24,13 @@ public class FilmDetails extends AbstractEntity {
 
     @Column
     public Integer releaseYear;
+
+    @Column
+    public String format;
+
+    /** Comma-separated names rather than a normalized cast/People table — consistent
+     *  with how tags are entered elsewhere (comma-separated text input). Revisit if
+     *  per-actor search/filtering becomes a real need. */
+    @Column
+    public String actors;
 }

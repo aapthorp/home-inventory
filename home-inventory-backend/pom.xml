@@ -74,11 +74,6 @@
       <artifactId>quarkus-smallrye-openapi</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>io.minio</groupId>
-      <artifactId>minio</artifactId>
-      <version>8.5.17</version>
-    </dependency>
     <!-- Object storage client (MinIO/S3) — Quarkiverse community extension, note the groupId.
          Quarkiverse extensions trail the core Quarkus release by a version or two; this is
          the newest release as of writing and has been fine paired with 3.33.x in practice,
@@ -88,6 +83,14 @@
       <groupId>io.quarkiverse.minio</groupId>
       <artifactId>quarkus-minio</artifactId>
       <version>3.9.1</version>
+    </dependency>
+    <!-- Explicit — the Quarkiverse extension should pull this in transitively, but
+         io.minio.http.Method wasn't resolving without it in practice. Harmless to
+         pin directly since it's the same official MinIO Java SDK either way. -->
+    <dependency>
+      <groupId>io.minio</groupId>
+      <artifactId>minio</artifactId>
+      <version>8.5.17</version>
     </dependency>
 
     <dependency>

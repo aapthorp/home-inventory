@@ -25,11 +25,13 @@ public class BookDetailsHandler extends AbstractItemTypeDetailsHandler implement
             return Map.of();
         }
         Map<String, Object> map = new LinkedHashMap<>();
-        map.put("isbn", details.isbn);
+        map.put("isbn13", details.isbn13);
+        map.put("isbn10", details.isbn10);
         map.put("author", details.author);
         map.put("pageCount", details.pageCount);
         map.put("publisher", details.publisher);
         map.put("publishedYear", details.publishedYear);
+        map.put("format", details.format);
         return map;
     }
 
@@ -41,11 +43,13 @@ public class BookDetailsHandler extends AbstractItemTypeDetailsHandler implement
             entity = new BookDetails();
             entity.itemId = itemId;
         }
-        entity.isbn = asString(details.get("isbn"));
+        entity.isbn13 = asString(details.get("isbn13"));
+        entity.isbn10 = asString(details.get("isbn10"));
         entity.author = asString(details.get("author"));
         entity.pageCount = asInteger(details.get("pageCount"));
         entity.publisher = asString(details.get("publisher"));
         entity.publishedYear = asInteger(details.get("publishedYear"));
+        entity.format = asString(details.get("format"));
         if (entity.id == null) {
             entity.persist();
         }

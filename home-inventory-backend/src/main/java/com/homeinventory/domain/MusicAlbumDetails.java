@@ -24,4 +24,13 @@ public class MusicAlbumDetails extends AbstractEntity {
 
     @Column
     public Integer trackCount;
+
+    @Column
+    public String format;
+
+    @Column
+    public String ean;
+
+    @Column
+    public String upc;
 }

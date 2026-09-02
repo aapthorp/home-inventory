@@ -29,6 +29,8 @@ public class FilmDetailsHandler extends AbstractItemTypeDetailsHandler implement
         map.put("runtimeMinutes", details.runtimeMinutes);
         map.put("studio", details.studio);
         map.put("releaseYear", details.releaseYear);
+        map.put("format", details.format);
+        map.put("actors", details.actors);
         return map;
     }
 
@@ -44,6 +46,8 @@ public class FilmDetailsHandler extends AbstractItemTypeDetailsHandler implement
         entity.runtimeMinutes = asInteger(details.get("runtimeMinutes"));
         entity.studio = asString(details.get("studio"));
         entity.releaseYear = asInteger(details.get("releaseYear"));
+        entity.format = asString(details.get("format"));
+        entity.actors = asString(details.get("actors"));
         if (entity.id == null) {
             entity.persist();
         }
