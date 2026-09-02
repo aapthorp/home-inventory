@@ -102,6 +102,7 @@ export default function ItemsPage() {
           <thead>
             <tr>
               <th>Name</th>
+              <th>Type</th>
               <th>Brand / Model</th>
               <th>Location</th>
               <th>Category</th>
@@ -117,6 +118,7 @@ export default function ItemsPage() {
                 <td>
                   <Link to={`/items/${item.id}`}>{item.name}</Link>
                 </td>
+                <td>{item.itemType === "GENERIC" ? "—" : item.itemType.replace("_", " ").toLowerCase()}</td>
                 <td>{[item.brand, item.model].filter(Boolean).join(" ") || "—"}</td>
                 <td>{item.locationId ? locationById.get(item.locationId) ?? "—" : "—"}</td>
                 <td>{item.categoryId ? categoryById.get(item.categoryId) ?? "—" : "—"}</td>

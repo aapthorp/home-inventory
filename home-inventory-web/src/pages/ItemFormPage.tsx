@@ -6,7 +6,9 @@ import { locationHooks, categoryHooks, collectionHooks } from "@/api/resources";
 import { useBarcodeLookup } from "@/api/barcode";
 import { buildTree } from "@/utils/tree";
 import AttachmentsPanel from "@/components/AttachmentsPanel";
-import type { ItemCondition, ItemRequest, ItemStatus, Location, Category } from "@/types/inventory";
+import TypeDetailsForm from "@/components/TypeDetailsForm";
+import { useItemTypes } from "@/api/itemTypes";
+import type { ItemCondition, ItemRequest, ItemStatus, ItemTypeCode, Location, Category } from "@/types/inventory";
 
 function flattenForSelect<T extends { id: string; name: string }>(
   items: T[],
@@ -25,6 +27,7 @@ function flattenForSelect<T extends { id: string; name: string }>(
 }
 
 const emptyForm: ItemRequest = {
+  itemType: "GENERIC",
   name: "",
   description: null,
   categoryId: null,
@@ -45,6 +48,7 @@ const emptyForm: ItemRequest = {
   notes: null,
   tags: [],
   collectionIds: [],
+  details: {},
 };
 
 export default function ItemFormPage() {
@@ -56,6 +60,7 @@ export default function ItemFormPage() {
   const { data: locations } = locationHooks.useList();
   const { data: categories } = categoryHooks.useList();
   const { data: collections } = collectionHooks.useList();
+  const { data: itemTypes } = useItemTypes();
 
   const createItem = useCreateItem();
   const updateItem = useUpdateItem(id ?? "");
@@ -85,6 +90,24 @@ export default function ItemFormPage() {
   function field<K extends keyof ItemRequest>(key: K, value: ItemRequest[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
+
+  function handleTypeChange(itemType: ItemTypeCode) {
+    // Reset details when switching type — a previous type's fields (e.g. ISBN)
+    // don't make sense once you're describing a film instead of a book.
+    setForm((prev) => ({ ...prev, itemType, details: {} }));
+  }
+
+  function detailField(key: string, value: unknown) {
+    setForm((prev) => ({ ...prev, details: { ...prev.details, [key]: value } }));
+  }
+
+  const currentTypeSchema = itemTypes?.find((t) => t.code === form.itemType);
+  const barcodeHint =
+    form.itemType === "BOOK"
+      ? " — usually the same as ISBN-13 for a physical book"
+      : form.itemType === "MUSIC_ALBUM" || form.itemType === "FILM"
+        ? " — usually the same as the UPC/EAN"
+        : "";
 
   async function handleBarcodeLookup() {
     if (!form.barcode) return;
@@ -164,6 +187,21 @@ export default function ItemFormPage() {
           <input className="input" value={form.name} onChange={(e) => field("name", e.target.value)} required />
         </label>
 
+        <label className="form-field">
+          <span>Item type</span>
+          <select
+            className="select"
+            value={form.itemType}
+            onChange={(e) => handleTypeChange(e.target.value as ItemTypeCode)}
+          >
+            {(itemTypes ?? []).map((t) => (
+              <option key={t.code} value={t.code}>
+                {t.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <label className="form-field form-field-wide">
           <span>Description</span>
           <textarea
@@ -174,7 +212,7 @@ export default function ItemFormPage() {
         </label>
 
         <label className="form-field">
-          <span>Barcode</span>
+          <span>Barcode{barcodeHint}</span>
           <div className="input-with-button">
             <input
               className="input"
@@ -247,6 +285,15 @@ export default function ItemFormPage() {
             <option value="POOR">Poor</option>
           </select>
         </label>
+
+        {currentTypeSchema && currentTypeSchema.fields.length > 0 && (
+          <>
+            <div className="form-field-wide">
+              <span className="section-label">{currentTypeSchema.label} details</span>
+            </div>
+            <TypeDetailsForm fields={currentTypeSchema.fields} values={form.details} onChange={detailField} />
+          </>
+        )}
 
         <label className="form-field">
           <span>Status</span>

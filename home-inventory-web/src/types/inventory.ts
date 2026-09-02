@@ -45,8 +45,11 @@ export interface Collection {
   deletedAt: string | null;
 }
 
+export type ItemTypeCode = "GENERIC" | "BOOK" | "FILM" | "MUSIC_ALBUM";
+
 export interface Item {
   id: UUID;
+  itemType: ItemTypeCode;
   name: string;
   description: string | null;
   categoryId: UUID | null;
@@ -67,8 +70,25 @@ export interface Item {
   notes: string | null;
   tags: string[];
   collectionIds: UUID[];
+  // Type-specific fields (ISBN/author for BOOK, director/actors for FILM, etc.) —
+  // shape depends on itemType; empty for GENERIC. See ItemTypeSchema for what's
+  // available per type.
+  details: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface ItemTypeField {
+  key: string;
+  label: string;
+  inputType: "text" | "number" | "select";
+  options: string[] | null;
+}
+
+export interface ItemTypeSchema {
+  code: ItemTypeCode;
+  label: string;
+  fields: ItemTypeField[];
 }
 
 // Request payload shapes — match the backend's *Request records exactly.
